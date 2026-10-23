@@ -1,33 +1,146 @@
-<!DOCTYPE html>
-<html>
- <head>
-   <meta charset="UTF-8">
- <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
- <meta name="viewport" content="width=device-width,initial-scale=1">
- <link rel="stylesheet" href="./style.css" type="text/css">
- <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
-   <title>Weather</title>
-
- </head>
- <body>
-
-  <div class="location">
-    <h1 class="location-timezone">Timezone</h1>
-    <canvas class="icon" width="128" height="128"></canvas>
+<!doctype html>
+<html lang="en" data-theme="clear-day">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Weather</title>
+    <meta
+      name="description"
+      content="Live conditions, hourly and 10-day forecasts, air quality and more for any place on Earth."
+    />
+    <meta name="theme-color" content="#3b82f6" />
+    <meta name="color-scheme" content="dark" />
+    <meta property="og:title" content="Weather" />
+    <meta property="og:description" content="Live conditions, hourly and 10-day forecasts for any place on Earth." />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preconnect" href="https://api.open-meteo.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to forecast</a>
+    <div class="sky" aria-hidden="true">
+      <div class="sky-glow"></div>
+      <div class="sky-particles"></div>
     </div>
 
-  <div class="temperature">
-    <div class="degree-section">
-      <h2 class="temperature-degree">34</h2>
-      <span>F</span>
-    </div>
-    <div class="temperature-description">It's Freaking Cold</div>
-    <div class="credits">
-      <h3>Made with Pure Javascript & ❤ by <a href="#">Ioannis Lazaridis</a></h3></div>
-  </div>
-  </div>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Weather home">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="13" cy="13" r="6" fill="#fcd34d" />
+          <path fill="#fff" d="M24 26H11a5.5 5.5 0 0 1-.8-10.9A7 7 0 0 1 23.6 13 5.3 5.3 0 0 1 24 26z" />
+        </svg>
+        <span>Weather</span>
+      </a>
 
-<script src="./skycons.js"></script>
-<script src="./app.js"></script>
- </body>
+      <form id="search-form" class="search" role="search" autocomplete="off">
+        <label class="sr-only" for="search-input">Search for a city</label>
+        <svg
+          class="glyph search-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </svg>
+        <input
+          id="search-input"
+          type="search"
+          placeholder="Search city…"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded="false"
+          aria-controls="search-results"
+          enterkeyhint="search"
+          spellcheck="false"
+        />
+        <kbd class="search-kbd" aria-hidden="true">/</kbd>
+        <span class="search-spinner" aria-hidden="true"></span>
+        <ul id="search-results" class="suggestions" role="listbox" aria-label="Matching places" hidden></ul>
+      </form>
+
+      <div class="actions">
+        <button id="locate-btn" class="icon-btn" type="button" aria-label="Use my location" title="Use my location">
+          <svg
+            class="glyph"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+            <circle cx="12" cy="12" r="7" />
+          </svg>
+        </button>
+        <div class="segmented" role="group" aria-label="Temperature units">
+          <button type="button" data-units="metric" aria-pressed="true">°C</button>
+          <button type="button" data-units="imperial" aria-pressed="false">°F</button>
+        </div>
+      </div>
+    </header>
+
+    <nav id="favorites" class="favorites" aria-label="Saved places" hidden>
+      <ul id="favorites-list"></ul>
+    </nav>
+
+    <div id="notice" class="notice" role="alert" hidden></div>
+
+    <main id="main" class="layout is-empty is-loading" aria-busy="true" tabindex="-1">
+      <section id="hero" class="card hero" aria-label="Current conditions">
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-hero"></div>
+      </section>
+
+      <section class="card hourly" aria-labelledby="hourly-title">
+        <h2 id="hourly-title" class="card-title">Next 24 hours</h2>
+        <div id="hourly-body"><div class="skeleton skeleton-block"></div></div>
+      </section>
+
+      <section class="card daily" aria-labelledby="daily-title">
+        <h2 id="daily-title" class="card-title">10-day forecast</h2>
+        <div id="daily-body">
+          <div class="skeleton skeleton-line"></div>
+          <div class="skeleton skeleton-line"></div>
+          <div class="skeleton skeleton-line"></div>
+          <div class="skeleton skeleton-line"></div>
+        </div>
+      </section>
+
+      <section class="highlights" aria-labelledby="highlights-title">
+        <h2 id="highlights-title" class="card-title">Today's highlights</h2>
+        <div id="highlights-body" class="tiles">
+          <div class="tile skeleton"></div>
+          <div class="tile skeleton"></div>
+          <div class="tile skeleton"></div>
+          <div class="tile skeleton"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Made with ❤ by <a href="https://github.com/IoannisLazaridis" rel="noopener">Ioannis Lazaridis</a> · Weather data
+        by <a href="https://open-meteo.com/" rel="noopener">Open-Meteo</a> (CC BY 4.0) · Place names by
+        <a href="https://www.bigdatacloud.com/" rel="noopener">BigDataCloud</a>
+      </p>
+    </footer>
+
+    <noscript><p class="noscript">This app needs JavaScript to load the forecast.</p></noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
