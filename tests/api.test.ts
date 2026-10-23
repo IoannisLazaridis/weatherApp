@@ -100,6 +100,12 @@ describe('api', () => {
     expect(result).toEqual({ name: 'Current location', latitude: 1, longitude: 2 });
   });
 
+  it('rounds the device position to roughly 1 km', async () => {
+    mockFetch(() => jsonResponse({}, 503));
+    const result = await reverseGeocode(40.640123, 22.944987);
+    expect(result).toMatchObject({ latitude: 40.64, longitude: 22.94 });
+  });
+
   it('names a location from reverse geocoding', async () => {
     mockFetch(() =>
       jsonResponse({

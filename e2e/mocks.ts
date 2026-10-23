@@ -85,6 +85,6 @@ export async function mockApis(page: Page, { forecastStatus = 200 }: MockOptions
   await page.route('https://api.bigdatacloud.net/**', (route) =>
     route.fulfill({ json: { city: 'Athens', principalSubdivision: 'Attica', countryName: 'Greece' } }),
   );
-  await page.route(/fonts\.(googleapis|gstatic)\.com/, (route) => route.abort());
+  await page.route(/^https:\/\/fonts\.(googleapis|gstatic)\.com\//, (route) => route.abort());
   return calls;
 }

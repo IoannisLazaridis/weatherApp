@@ -164,7 +164,10 @@ interface ReverseGeocodeResponse {
 
 /** Best-effort name lookup for coordinates; falls back to a generic label. */
 export async function reverseGeocode(lat: number, lon: number, signal?: AbortSignal): Promise<Place> {
-  const fallback: Place = { name: 'Current location', latitude: lat, longitude: lon };
+  // ~1 km precision is plenty for a forecast, and this place is persisted in localStorage,
+  // so avoid keeping the device's exact position.
+  const round = (n: number): number => Math.round(n * 100) / 100;
+  const fallback: Place = { name: 'Current location', latitude: round(lat), longitude: round(lon) };
   try {
     const params = new URLSearchParams({
       latitude: coord(lat),

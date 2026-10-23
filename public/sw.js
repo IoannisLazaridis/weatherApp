@@ -81,7 +81,7 @@ self.addEventListener('fetch', (event) => {
 
   if (
     url.origin === self.location.origin ||
-    url.hostname.endsWith('fonts.gstatic.com') ||
+    url.hostname === 'fonts.gstatic.com' ||
     url.hostname === 'fonts.googleapis.com'
   ) {
     event.respondWith(staleWhileRevalidate(request));
