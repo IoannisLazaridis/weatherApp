@@ -1,0 +1,48 @@
+name: Deploy
+
+# Deploys to Firebase Hosting: pull requests get a temporary preview URL posted as a
+# comment, pushes to master go live. Requires the FIREBASE_SERVICE_ACCOUNT secret
+# (see README); without it these jobs are skipped.
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: ${{ github.event_name == 'pull_request' && 'Preview' || 'Production' }}
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+    env:
+      HAS_SECRET: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+    environment:
+      name: ${{ github.event_name == 'pull_request' && 'preview' || 'production' }}
+    steps:
+      - uses: actions/checkout@v4
+        if: env.HAS_SECRET == 'true'
+      - uses: actions/setup-node@v4
+        if: env.HAS_SECRET == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci && npm run build
+        if: env.HAS_SECRET == 'true'
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        if: env.HAS_SECRET == 'true'
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: weatherapp-47ce4
+          channelId: ${{ github.event_name == 'push' && 'live' || '' }}
+          expires: 7d
+      - name: Skipped
+        if: env.HAS_SECRET != 'true'
+        run: echo "::notice::FIREBASE_SERVICE_ACCOUNT secret not set; skipping deploy."

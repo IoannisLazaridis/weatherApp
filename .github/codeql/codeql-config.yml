@@ -1,0 +1,9 @@
+name: Weather CodeQL config
+
+query-filters:
+  # Heuristic rule that treats any "latitude"/"longitude" property as sensitive. The app
+  # stores only city-level places the user searched for or saved, plus their current
+  # location rounded to ~1 km, in localStorage. That is a deliberate product feature, so
+  # the alert is a known false positive. See src/api.ts (reverseGeocode) and src/storage.ts.
+  - exclude:
+      id: js/clear-text-storage-sensitive-data
