@@ -1,5 +1,14 @@
 # Weather
 
+[![CI](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/ci.yml/badge.svg)](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/codeql.yml/badge.svg)](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/codeql.yml)
+[![Deploy](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/deploy.yml/badge.svg)](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/deploy.yml)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)
+![Tested with Vitest](https://img.shields.io/badge/tested%20with-Vitest%20%2B%20Playwright-6e9f18?logo=vitest&logoColor=white)
+![Weather data: Open-Meteo](https://img.shields.io/badge/data-Open--Meteo-ff8c00)
+![No API key](https://img.shields.io/badge/API%20key-not%20needed-brightgreen)
+
 A fast, accessible weather web app with live conditions, a 24-hour forecast chart, a 10-day outlook and air quality for any place on Earth.
 
 Live: <https://weatherapp-47ce4.web.app>
@@ -22,26 +31,41 @@ Live: <https://weatherapp-47ce4.web.app>
 - [Vite](https://vite.dev) + TypeScript (strict), with no UI framework. The production JS bundle is about 11 KB gzipped.
 - [Open-Meteo](https://open-meteo.com) for the forecast, air quality and geocoding. It is free and needs no API key.
 - [BigDataCloud](https://www.bigdatacloud.com/) client-side reverse geocoding to name your current location.
-- Vitest + jsdom for tests, ESLint (typescript-eslint) and Prettier for code quality, and GitHub Actions CI.
+- Vitest + jsdom unit tests with coverage, Playwright end-to-end tests on desktop and mobile, ESLint (typescript-eslint) and Prettier.
 
 ## Getting started
 
-Requires Node.js 20 or later.
+Requires Node.js 22.12 or later.
 
 ```bash
 npm install
 npm run dev        # start the dev server at http://localhost:5173
 ```
 
-| Script            | What it does                                  |
-| ----------------- | --------------------------------------------- |
-| `npm run dev`     | Dev server with hot reload                    |
-| `npm run build`   | Type-check, then build to `dist/`             |
-| `npm run preview` | Serve the production build locally            |
-| `npm test`        | Run the unit tests                            |
-| `npm run lint`    | Lint with ESLint                              |
-| `npm run format`  | Format with Prettier                          |
-| `npm run check`   | Lint + typecheck + tests + build (same as CI) |
+| Script                  | What it does                                  |
+| ----------------------- | --------------------------------------------- |
+| `npm run dev`           | Dev server with hot reload                    |
+| `npm run build`         | Type-check, then build to `dist/`             |
+| `npm run preview`       | Serve the production build locally            |
+| `npm test`              | Run the unit tests                            |
+| `npm run test:coverage` | Unit tests with a coverage report             |
+| `npm run test:e2e`      | Playwright end-to-end tests                   |
+| `npm run lint`          | Lint with ESLint                              |
+| `npm run format`        | Format with Prettier                          |
+| `npm run check`         | Lint + typecheck + tests + build (same as CI) |
+
+## Continuous integration
+
+Every push and pull request runs on GitHub Actions:
+
+| Workflow                               | What it checks                                                                                                                                                                          |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [CI](.github/workflows/ci.yml)         | ESLint, Prettier, TypeScript, unit tests on Node 22 and 24 with coverage thresholds, Playwright e2e on desktop and mobile, production build with a bundle-size report, Lighthouse audit |
+| [CodeQL](.github/workflows/codeql.yml) | Security analysis on every PR and weekly                                                                                                                                                |
+| [Deploy](.github/workflows/deploy.yml) | Preview URL for each pull request, production deploy from `master`                                                                                                                      |
+| [Dependabot](.github/dependabot.yml)   | Weekly grouped dependency updates, monthly Actions updates                                                                                                                              |
+
+Coverage and bundle-size tables appear in each run's summary. Playwright reports, coverage HTML and Lighthouse results are uploaded as artifacts.
 
 ## Deploying
 
@@ -51,6 +75,10 @@ npm run dev        # start the dev server at http://localhost:5173
 npm run build
 npx firebase-tools deploy --only hosting
 ```
+
+### Automatic deploys
+
+To let the Deploy workflow publish for you, run `npx firebase-tools init hosting:github` once (it creates a service account), or add a Firebase service account JSON yourself as the repository secret `FIREBASE_SERVICE_ACCOUNT`. Until that secret exists, the workflow skips deploying.
 
 ## Project structure
 
@@ -68,6 +96,7 @@ src/
   styles.css
 public/            manifest, icons, service worker
 tests/             unit tests
+e2e/               Playwright end-to-end tests (with mocked APIs)
 ```
 
 ## Credits

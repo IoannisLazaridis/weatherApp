@@ -6,3 +6,6 @@ coverage
 .firebase
 .env*
 !.env.example
+playwright-report
+test-results
+.lighthouseci

@@ -3,3 +3,6 @@ coverage
 package-lock.json
 CODE_OF_CONDUCT.md
 .github/ISSUE_TEMPLATE
+playwright-report
+test-results
+.lighthouseci

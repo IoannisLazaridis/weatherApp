@@ -122,7 +122,7 @@ function setBusy(busy: boolean): void {
   el.main.classList.toggle('is-loading', busy);
 }
 
-async function loadPlace(place: Place, { force = false, silent = false } = {}): Promise<void> {
+async function loadPlace(place: Place, { force = false, silent = false, keepNotice = false } = {}): Promise<void> {
   state.controller?.abort();
   const controller = new AbortController();
   state.controller = controller;
@@ -134,7 +134,7 @@ async function loadPlace(place: Place, { force = false, silent = false } = {}): 
     const report = await getWeather(place, { signal: controller.signal, force });
     if (controller.signal.aborted) return;
     state.report = report;
-    hideNotice();
+    if (!keepNotice) hideNotice();
     saveLastPlace(place);
     history.replaceState(null, '', placeToSearch(place));
     render();
@@ -161,7 +161,7 @@ async function locate({ fallback }: { fallback?: Place } = {}): Promise<void> {
     await loadPlace(place);
   } catch (error) {
     showNotice(geolocationErrorMessage(error), { tone: 'info' });
-    if (fallback) await loadPlace(fallback);
+    if (fallback) await loadPlace(fallback, { keepNotice: true });
   } finally {
     el.locate.classList.remove('is-locating');
     el.locate.disabled = false;
