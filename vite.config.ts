@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  // Relative asset URLs let the same build work at a domain root (Firebase) and under /<repo>/ (GitHub Pages).
+  base: './',
   build: {
     target: 'es2022',
     sourcemap: true,

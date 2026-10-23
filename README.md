@@ -2,7 +2,8 @@
 
 [![CI](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/ci.yml/badge.svg)](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/codeql.yml/badge.svg)](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/codeql.yml)
-[![Deploy](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/deploy.yml/badge.svg)](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/deploy.yml)
+[![Deploy to Pages](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/pages.yml/badge.svg)](https://github.com/IoannisLazaridis/weatherApp/actions/workflows/pages.yml)
+[![Live demo](https://img.shields.io/badge/live-demo-2563eb?logo=github)](https://ioannislazaridis.github.io/weatherApp/)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)
 ![Tested with Vitest](https://img.shields.io/badge/tested%20with-Vitest%20%2B%20Playwright-6e9f18?logo=vitest&logoColor=white)
@@ -11,7 +12,7 @@
 
 A fast, accessible weather web app with live conditions, a 24-hour forecast chart, a 10-day outlook and air quality for any place on Earth.
 
-Live: <https://weatherapp-47ce4.web.app>
+**Live demo: <https://ioannislazaridis.github.io/weatherApp/>**
 
 ## Features
 
@@ -69,14 +70,20 @@ Coverage and bundle-size tables appear in each run's summary. Playwright reports
 
 ## Deploying
 
-`dist/` is a fully static site, so any static host works. Firebase Hosting is preconfigured, including security headers, a Content Security Policy and long-lived caching for hashed assets:
+### GitHub Pages (live demo)
+
+The [GitHub Pages workflow](.github/workflows/pages.yml) builds the app and publishes it to <https://ioannislazaridis.github.io/weatherApp/> whenever `master` changes. Enable it once under **Settings → Pages → Source: GitHub Actions**. The build uses relative URLs, so the same output also works at a domain root.
+
+### Firebase Hosting (optional)
+
+`dist/` is a fully static site, so any static host works. Firebase Hosting is also preconfigured, including security headers, a Content Security Policy and long-lived caching for hashed assets:
 
 ```bash
 npm run build
 npx firebase-tools deploy --only hosting
 ```
 
-### Automatic deploys
+#### Automatic Firebase deploys
 
 To let the Deploy workflow publish for you, run `npx firebase-tools init hosting:github` once (it creates a service account), or add a Firebase service account JSON yourself as the repository secret `FIREBASE_SERVICE_ACCOUNT`. Until that secret exists, the workflow skips deploying.
 

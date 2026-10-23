@@ -12,7 +12,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(SHELL_CACHE)
-      .then((cache) => cache.addAll(['/', '/manifest.webmanifest', '/favicon.svg']))
+      .then((cache) => cache.addAll(['./', './manifest.webmanifest', './favicon.svg']))
       .then(() => self.skipWaiting()),
   );
 });
@@ -70,7 +70,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
 
   if (request.mode === 'navigate') {
-    event.respondWith(networkFirst(request, SHELL_CACHE, '/'));
+    event.respondWith(networkFirst(request, SHELL_CACHE, self.registration.scope));
     return;
   }
 
